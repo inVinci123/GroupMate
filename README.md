@@ -29,3 +29,8 @@ Discord Bot Setup (Core)
 - Progress roles: Bot assigns a Discord role like “On Track” or “Needs Reminder” based on task status.
 - Auto assignment breakdown: Upload an assignment brief, and break it down into tasks to do/suggestions to add as tasks with deadlines.
 
+
+## DIRECTORY STRUCTURE
+- /bot - contains code for the discord bot
+- /dashboard - contains react code for the dashboard
+- /shared - shared bot data for now
