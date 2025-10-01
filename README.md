@@ -39,6 +39,7 @@ Discord Bot Setup (Core)
 
 
 ### POST /init_project
+Initialise the project (probably gonna be called from the discord bot). Users correspond to discord usernames.
 ```json
 {
   "users": ["alice", "bob", "charlie"]
@@ -48,6 +49,7 @@ Discord Bot Setup (Core)
 Return nothing.
 
 ### POST /create_task
+Create a task with title, deadline, and a list of usernames assigned to this task (discord usernames)
 ```json
 {
   "title": "Finish report",
@@ -56,7 +58,7 @@ Return nothing.
 }
 ```
 
-Returns
+Returns the task id:
 ```json
 {
   "id": "uuid-string"
@@ -66,6 +68,7 @@ Returns
 
 ### GET /get_users
 ```json
+Get all users in the server
 {
   "users": ["alice", "bob", "charlie"]
 }
@@ -73,7 +76,7 @@ Returns
 
 ### GET /user/<username>/task_list
 
-
+Get tasks for a specific user.
 ```
 json
 {
@@ -100,6 +103,8 @@ json
 
 ### GET /get_progress
 
+Get progress of the project
+
 ```json
 {
   "completed": 2,
@@ -110,6 +115,8 @@ json
 ```
 
 ### GET /get_current_tasks
+
+Get all tasks that are in progress
 ```json
 {
   "tasks": [
@@ -123,8 +130,8 @@ json
   ]
 }
 ```
-
 ## Task Object Schema
+This is what the task object looks internally.
 ```json
 {
   "id": "uuid-string",
