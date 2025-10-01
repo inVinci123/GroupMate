@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect
 import json, uuid
+from helper import *
 
 # Create a Flask application instance
 app = Flask(__name__)
@@ -10,7 +11,7 @@ def hello_world():
     return 'Hello, World!'
 
 @app.route('/init_project', methods=['POST'])
-def init_project():
+def init_project_route():
     if request.method != 'POST':
         return redirect('/')
 
@@ -20,103 +21,44 @@ def init_project():
     if not ('users' in request.json):
         return redirect('/')
     
-    try:
-        with open('./shared/data.json', 'r') as f:
-            json_file = json.load(f)
-    except FileNotFoundError:
-        json_file = {}
-    
-    # add usernames to our database
-    json_file['users'] = []
-    for user in request.json['users']:
-        print(user.strip())
-        json_file['users'].append(str(user).strip())
-    # json_file['users'] = request.json['users']
-    
-    with open('./shared/data.json', 'w') as f:
-        json.dump(json_file, f)
+    update_users(request.json['users'])
 
     return ""
 
 # POST /create_task
 @app.route('/create_task', methods=['POST'])
-def create_task():
+def create_task_route():
     if request.method == 'POST':
         if not request.json:
             return redirect('/')
         if not ('deadline' in request.json or 'title' in request.json or 'usernames' in request.json):
             return redirect('/')
         
-        task = {
-            'id': str(uuid.uuid4()),
-            'title': request.json['title'],
-            'deadline': request.json['deadline'],
-            'usernames': request.json['usernames'],
-            'status': 'NOT_STARTED'
-        }
-        
-        try:
-            with open('./shared/data.json', 'r') as f:
-                json_file = json.load(f)
-        except FileNotFoundError:
-            json_file = {}
-
-        if 'tasks' in json_file:
-            json_file['tasks'].append(task)
-        else:
-            json_file['tasks'] = [task]
-        
-        with open('./shared/data.json', 'w') as f:
-            json.dump(json_file, f)
-
-        return {'id': task['id']}
+        return create_task(request.json['title'], request.json['deadline'], request.json['usernames'])
     
     return redirect('/')
 
 @app.route('/get_users')
-def get_users():
-    with open('./shared/data.json', 'r') as f:
-        json_file = json.load(f)
-        if 'users' in json_file:
-            return {'users': json_file['users']}
-    
-    return {'users': []}
+def get_users_route():
+    return get_users()
 
-# @app.route()
-# def get_user_task_list():
+@app.route('/user/<username>/task_list')
+def get_user_tasklist_route(username):
+    print(username)
+    return get_user_tasks(username)
 
-# GET /user/{user_id}/tasks_list
-# Response will contain
-example = {
-    'tasks': [
-        {
-            'id': 0,
-            'title': 'important work',
-            'deadline': '12/12/25',
-        },
-    ]
-}
+@app.route('/get_upcoming_tasks')
+def get_upcoming_tasks_route():
+    #TODO: convert dates into unix time...
+    return get_upcoming_tasks()
 
-# GET /upcoming_tasks
-example = {
-    'tasks': [
-        {
-            'id': 0,
-            'title': 'important work',
-            'deadline': '12/12/25',
-        },
-    ]
-}
+@app.route('/get_progress')
+def get_progress_route():
+    return get_progress()
 
-# GET /progress
-example = {
-    'completed': 2,
-    'in_progress': 4,
-    'total': 100
-}
-
-# GET /current_task
-
+@app.route('/get_current_tasks')
+def get_current_tasks_route():
+    return get_current_tasks()
 
 # PUT /user/task [or post]
 example = {
