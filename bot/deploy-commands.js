@@ -27,8 +27,8 @@ const commands = [
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
-const CLIENT_ID = "YOUR_CLIENT_ID";
-const GUILD_ID = "YOUR_TEST_GUILD_ID"; 
+const CLIENT_ID = 1422842708279693422;
+const GUILD_ID = 1422845854091579454; 
 
 (async () => {
   try {
