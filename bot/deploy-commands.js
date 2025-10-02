@@ -73,6 +73,25 @@ const commands = [
           { name: "In Progress", value: "In Progress" },
           { name: "Finished", value: "Finished" }
         )
+    ),
+    
+  new SlashCommandBuilder()
+    .setName("assigntask")
+    .setDescription("Assign a task to a user")
+    .addStringOption(option =>
+      option.setName("project")
+        .setDescription("Project name")
+        .setRequired(true)
+    )
+    .addIntegerOption(option =>
+      option.setName("index")
+        .setDescription("Task number from listprojects")
+        .setRequired(true)
+    )
+    .addUserOption(option =>
+      option.setName("user")
+        .setDescription("User to assign the task to")
+        .setRequired(true)
     )
 ].map(cmd => cmd.toJSON());
 

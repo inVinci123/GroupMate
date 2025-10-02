@@ -21,7 +21,7 @@ const client = new Client({
 const projects = {};
 
 // Correct ready event
-client.once("cilentReady", () => {
+client.once("ready", () => {   // fixed typo (was cilentReady)
   console.log(`Logged in as ${client.user.tag}`);
 });
 
@@ -56,7 +56,7 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: `Project "${project}" does not exist!`, ephemeral: true });
     }
 
-    projects[project].push({ task, due, status: "Not Started" });
+    projects[project].push({ task, due, status: "Not Started", assignedTo: null });
     await interaction.reply(`Task "${task}" added to project "${project}", due ${due}`);
   }
 
@@ -68,12 +68,13 @@ client.on("interactionCreate", async (interaction) => {
 
     let message = "Projects and Tasks:\n";
     for (const [proj, tasks] of Object.entries(projects)) {
-      message += `\n${proj}\n`;
+      message += `\n**${proj}**\n`;
       if (tasks.length === 0) {
         message += " No tasks yet\n";
       } else {
         tasks.forEach((t, i) => {
-          message += `  ${i + 1}. ${t.task} - ${t.due} [${t.status}]\n`;
+          const assigned = t.assignedTo ? ` (Assigned to <@${t.assignedTo}>)` : "";
+          message += `  ${i + 1}. ${t.task} - ${t.due} [${t.status}]${assigned}\n`;
         });
       }
     }
@@ -96,6 +97,23 @@ client.on("interactionCreate", async (interaction) => {
 
     projects[project][taskIndex].status = status;
     await interaction.reply(`Task #${taskIndex + 1} in project "${project}" updated to **${status}**`);
+  }
+
+  // /assigntask
+  if (commandName === "assigntask") {
+    const project = interaction.options.getString("project");
+    const taskIndex = interaction.options.getInteger("index") - 1;
+    const user = interaction.options.getUser("user");
+
+    if (!projects[project]) {
+      return interaction.reply({ content: `Project "${project}" does not exist!`, ephemeral: true });
+    }
+    if (!projects[project][taskIndex]) {
+      return interaction.reply({ content: `Task #${taskIndex + 1} does not exist in project "${project}"!`, ephemeral: true });
+    }
+
+    projects[project][taskIndex].assignedTo = user.id;
+    await interaction.reply(`Task #${taskIndex + 1} in project "${project}" assigned to ${user}`);
   }
 
   // /dashboard
