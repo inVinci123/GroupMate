@@ -111,6 +111,8 @@ import OverallProgressCard, { type ProgressData } from './OverallProgressCard';
 //   },
 // ];
 
+
+
 function App() {
   const [screen, setScreen] = useState<'dashboard' | 'tasks'>('dashboard');
   const [tasks, setTasks] = useState<Task[]>([]); // useState<Task[]>(initialTasks);
@@ -121,7 +123,7 @@ function App() {
   in_progress: 1,
   not_started: 3,
   total: 6,
-}); // useState<Task[]>(initialTasks);
+  }); // useState<Task[]>(initialTasks);
   const [showModal, setShowModal] = useState(false);
 
   const [newTask, setNewTask] = useState({
@@ -129,6 +131,54 @@ function App() {
     assignee: '',
     due: '',
   });
+
+
+  const fetchEverything = async () => {
+    try {
+      const tasksRes = await fetch("http://127.0.0.1:5000/get_all_tasks");
+      const tasksJson = await tasksRes.json();
+
+      const dashboardTasksRes = await fetch("http://127.0.0.1:5000/user/cokescam/task_list");
+      const dashboardTasksJson = await dashboardTasksRes.json();
+
+      const progressRes = await fetch("http://127.0.0.1:5000/get_progress");
+      const progressJson = await progressRes.json();
+
+      // Map backend → frontend
+      const mappedAll: AllTask[] = (tasksJson.tasks || []).map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        deadline: t.deadline,
+        usernames: t.usernames ?? [],
+        status:
+          t.status === "COMPLETE"
+            ? "COMPLETED"
+            : t.status === "INPROGRESS"
+            ? "IN_PROGRESS"
+            : "NOT_STARTED",
+      }));
+
+      const mappedDashboard: DashboardTask[] = (dashboardTasksJson.tasks || []).map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        deadline: t.deadline,
+        usernames: t.usernames ?? [],
+        status:
+          t.status === "COMPLETE"
+            ? "COMPLETED"
+            : t.status === "INPROGRESS"
+            ? "IN_PROGRESS"
+            : "NOT_STARTED",
+      }));
+
+      setAllTasks(mappedAll || []);
+      setDashboardTasks(mappedDashboard || []);
+      setProgressData(progressJson);
+    } catch (err) {
+      console.error("Error fetching everything:", err);
+    }
+  };
+
 
   useEffect(() => {
     async function fetchData() {
@@ -226,20 +276,54 @@ function App() {
     );
   };
 
-  const handleCreateTask = () => {
+  const handleCreateTask = async () => {
     // Example: Add to tasks (customize as needed)
-    if (newTask.title && newTask.assignee && newTask.due) {
-      setTasks([
-        ...tasks,
-        {
-          id: tasks.length + 1,
+    console.log("nah");
+    if (!newTask.title || !newTask.assignee || !newTask.due) return;
+    console.log("WALLAHHHHH");
+    try {
+      const res = await fetch("http://127.0.0.1:5000/create_task", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           title: newTask.title,
-          due: newTask.due,
-          stage: 'not_started',
-        },
-      ]);
+          deadline: newTask.due,
+          usernames: newTask.assignee.split(",").map((u) => u.trim()),
+          status: "NOT_STARTED",
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create task");
+      }
+
+      const createdTask = await res.json();
+      console.log("Task created:", createdTask);
+
+      // Refresh tasks from backend
+      const tasksRes = await fetch("http://127.0.0.1:5000/get_all_tasks");
+      const tasksJson = await tasksRes.json();
+      setAllTasks(
+        (tasksJson.tasks || []).map((t: any) => ({
+          id: t.id,
+          title: t.title,
+          deadline: t.deadline,
+          usernames: t.usernames ?? [],
+          status:
+            t.status === "COMPLETE"
+              ? "COMPLETED"
+              : t.status === "INPROGRESS"
+              ? "IN_PROGRESS"
+              : "NOT_STARTED",
+        }))
+      );
+      
       setShowModal(false);
       setNewTask({ title: '', assignee: '', due: '' });
+      fetchEverything();
+    }
+    catch (err) {
+        console.error("Error creating task:", err);
     }
   };
 
@@ -420,21 +504,8 @@ function App() {
               </button>
               <button
                 className="px-4 py-2 rounded bg-pink-500 text-white font-semibold"
-                onClick={() => {
-                  if (newTask.title && newTask.assignee && newTask.due) {
-                    setTasks([
-                      ...tasks,
-                      {
-                        id: tasks.length + 1,
-                        title: newTask.title,
-                        due: newTask.due,
-                        stage: 'not_started',
-                      },
-                    ]);
-                    setShowModal(false);
-                    setNewTask({ title: '', assignee: '', due: '' });
-                  }
-                }}
+                onClick={handleCreateTask}
+              
               >
                 Create Task
               </button>
