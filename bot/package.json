@@ -2,9 +2,13 @@
   "name": "groupmate-bot",
   "version": "1.0.0",
   "type": "module",
-  "main": "bot.js",
+  "private": true,
+  "scripts": {
+    "start": "node bot.js",
+    "deploy": "node deploy-commands.js"
+  },
   "dependencies": {
-    "discord.js": "^14.15.3",
+    "discord.js": "^15.0.0",
     "dotenv": "^17.2.3"
   }
 }
