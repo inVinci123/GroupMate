@@ -1,119 +1,127 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import Tasks, { type Task } from './TasksPage'; // <-- Import Task type
 import YourTasksCard, { type DashboardTask } from './YourTasksCard';
 import AllTasksCard, { type AllTask } from './AllTasksCard';
-import OverallProgressCard from './OverallProgressCard';
+import OverallProgressCard, { type ProgressData } from './OverallProgressCard';
 
 // Example data bcs idk how to use the json stuff
 
-const progressData = {
+// const progressData = {
+//   completed: 2,
+//   in_progress: 1,
+//   not_started: 3,
+//   total: 6,
+// };
+
+// const allTasks: AllTask[] = [
+//   {
+//     id: 'a1b2c3d4',
+//     title: 'Group meeting',
+//     deadline: '2025-10-02',
+//     usernames: ['bob', 'alice'],
+//     status: 'IN_PROGRESS',
+//   },
+//   {
+//     id: 'a1b6c3d4',
+//     title: 'Group meeting',
+//     deadline: '2025-10-02',
+//     usernames: ['bob', 'alice'],
+//     status: 'IN_PROGRESS',
+//   },
+//   {
+//     id: 'a1b2c3d4',
+//     title: 'Group meeting',
+//     deadline: '2025-10-02',
+//     usernames: ['bob', 'alice'],
+//     status: 'IN_PROGRESS',
+//   },
+//   {
+//     id: 'e5f6g7h8',
+//     title: 'Prepare slides',
+//     deadline: '2025-10-05',
+//     usernames: ['carol'],
+//     status: 'NOT_STARTED',
+//   },
+//   {
+//     id: 'i9j0k1l2',
+//     title: 'Submit report',
+//     deadline: '2025-10-10',
+//     usernames: ['dave', 'eve'],
+//     status: 'COMPLETED',
+//   },
+//   {
+//     id: 'm3n4o5p6',
+//     title: 'Review code',
+//     deadline: '2025-10-08',
+//     usernames: ['alice'],
+//     status: 'IN_PROGRESS',
+//   },
+// ];
+
+// const dashboardTasks: DashboardTask[] = [
+//   {
+//     id: '1',
+//     title: 'Finish report',
+//     deadline: '2025-10-15',
+//     usernames: ['alice', 'bob'],
+//     status: 'NOT_STARTED',
+//   },
+//   {
+//     id: '4',
+//     title: 'Finish report',
+//     deadline: '2025-10-15',
+//     usernames: ['alice', 'bob'],
+//     status: 'NOT_STARTED',
+//   },
+//   {
+//     id: '2',
+//     title: 'Review PR',
+//     deadline: '2025-10-10',
+//     usernames: ['carol'],
+//     status: 'IN_PROGRESS',
+//   },
+//   {
+//     id: '3',
+//     title: 'Deploy update',
+//     deadline: '2025-10-05',
+//     usernames: ['dave'],
+//     status: 'COMPLETED',
+//   },
+// ];
+
+// const initialTasks: Task[] = [
+//   {
+//     id: 1,
+//     title: 'Chart the Cosmic Winds',
+//     due: 'Oct 30, 2023',
+//     stage: 'in_progress',
+//   },
+//   {
+//     id: 2,
+//     title: 'Gather Stardust Samples',
+//     due: 'Nov 05, 2023',
+//     stage: 'not_started',
+//   },
+//   {
+//     id: 3,
+//     title: 'Map the Asteroid Belt',
+//     due: 'Oct 20, 2023',
+//     stage: 'completed',
+//   },
+// ];
+
+function App() {
+  const [screen, setScreen] = useState<'dashboard' | 'tasks'>('dashboard');
+  const [tasks, setTasks] = useState<Task[]>([]); // useState<Task[]>(initialTasks);
+  const [dashboardTasks, setDashboardTasks] = useState<DashboardTask[]>([]); // useState<Task[]>(initialTasks);
+  const [allTasks, setAllTasks] = useState<AllTask[]>([]); // useState<Task[]>(initialTasks);
+  const [progressData, setProgressData] = useState<ProgressData>({
   completed: 2,
   in_progress: 1,
   not_started: 3,
   total: 6,
-};
-
-const allTasks: AllTask[] = [
-  {
-    id: 'a1b2c3d4',
-    title: 'Group meeting',
-    deadline: '2025-10-02',
-    usernames: ['bob', 'alice'],
-    status: 'IN_PROGRESS',
-  },
-  {
-    id: 'a1b6c3d4',
-    title: 'Group meeting',
-    deadline: '2025-10-02',
-    usernames: ['bob', 'alice'],
-    status: 'IN_PROGRESS',
-  },
-  {
-    id: 'a1b2c3d4',
-    title: 'Group meeting',
-    deadline: '2025-10-02',
-    usernames: ['bob', 'alice'],
-    status: 'IN_PROGRESS',
-  },
-  {
-    id: 'e5f6g7h8',
-    title: 'Prepare slides',
-    deadline: '2025-10-05',
-    usernames: ['carol'],
-    status: 'NOT_STARTED',
-  },
-  {
-    id: 'i9j0k1l2',
-    title: 'Submit report',
-    deadline: '2025-10-10',
-    usernames: ['dave', 'eve'],
-    status: 'COMPLETED',
-  },
-  {
-    id: 'm3n4o5p6',
-    title: 'Review code',
-    deadline: '2025-10-08',
-    usernames: ['alice'],
-    status: 'IN_PROGRESS',
-  },
-];
-
-const dashboardTasks: DashboardTask[] = [
-  {
-    id: '1',
-    title: 'Finish report',
-    deadline: '2025-10-15',
-    usernames: ['alice', 'bob'],
-    status: 'NOT_STARTED',
-  },
-  {
-    id: '4',
-    title: 'Finish report',
-    deadline: '2025-10-15',
-    usernames: ['alice', 'bob'],
-    status: 'NOT_STARTED',
-  },
-  {
-    id: '2',
-    title: 'Review PR',
-    deadline: '2025-10-10',
-    usernames: ['carol'],
-    status: 'IN_PROGRESS',
-  },
-  {
-    id: '3',
-    title: 'Deploy update',
-    deadline: '2025-10-05',
-    usernames: ['dave'],
-    status: 'COMPLETED',
-  },
-];
-
-const initialTasks: Task[] = [
-  {
-    id: 1,
-    title: 'Chart the Cosmic Winds',
-    due: 'Oct 30, 2023',
-    stage: 'in_progress',
-  },
-  {
-    id: 2,
-    title: 'Gather Stardust Samples',
-    due: 'Nov 05, 2023',
-    stage: 'not_started',
-  },
-  {
-    id: 3,
-    title: 'Map the Asteroid Belt',
-    due: 'Oct 20, 2023',
-    stage: 'completed',
-  },
-];
-
-function App() {
-  const [screen, setScreen] = useState<'dashboard' | 'tasks'>('dashboard');
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+}); // useState<Task[]>(initialTasks);
   const [showModal, setShowModal] = useState(false);
 
   const [newTask, setNewTask] = useState({
@@ -121,6 +129,82 @@ function App() {
     assignee: '',
     due: '',
   });
+
+  useEffect(() => {
+    async function fetchData() {
+      console.log("fetching dataaa");
+      try {
+        // const usersRes = await fetch("/get_users");
+        // const usersJson = await usersRes.json();
+        // setUsers(usersJson.users);
+
+        const tasksRes = await fetch("http://127.0.0.1:5000/get_all_tasks");
+        const tasksJson = await tasksRes.json();
+
+        const dashboardTasksRes = await fetch("http://127.0.0.1:5000/user/cokescam/task_list");
+        const dashboardTasksJson = await dashboardTasksRes.json();
+
+        const progressRes = await fetch("http://127.0.0.1:5000/get_progress");
+        const progressJson = await progressRes.json();
+        // console.log("Fetched data:", tasksJson)
+
+        // Map backend shape -> frontend shape
+        const mapped = (tasksJson.tasks || []).map((t: any, index: number) => ({
+          id: index + 1, // or use t.id if you update Task type to string
+          title: t.title,
+          due: t.deadline,
+          stage:
+            t.status === "NOT_STARTED"
+              ? "not_started"
+              : t.status === "INPROGRESS"
+              ? "in_progress"
+              : "completed",
+            usernames: t.usernames
+        }));
+
+        const mappedAll: AllTask[] = (tasksJson.tasks || []).map((t: any) => ({
+          id: t.id,
+          title: t.title,
+          deadline: t.deadline,
+          usernames: t.usernames ?? [],
+          status:
+            t.status === "COMPLETE"
+              ? "COMPLETED"
+              : t.status === "INPROGRESS"
+              ? "IN_PROGRESS"
+              : "NOT_STARTED",
+        }));
+
+        // Dashboard tasks mapping (user-specific)
+        const mappedDashboard: DashboardTask[] = (dashboardTasksJson.tasks || []).map(
+          (t: any) => ({
+            id: t.id,
+            title: t.title,
+            deadline: t.deadline,
+            usernames: t.usernames ?? [],
+            status:
+              t.status === "COMPLETE"
+                ? "COMPLETED"
+                : t.status === "INPROGRESS"
+                ? "IN_PROGRESS"
+                : "NOT_STARTED",
+          })
+        );
+
+        console.log("CHECKPOINT MATE");
+
+        setTasks(mapped || []);
+        setAllTasks(mappedAll || []);
+        console.log("pROGRESS JSON", progressJson);
+        setDashboardTasks(mappedDashboard || []);
+        setProgressData(progressJson);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const moveTask = (id: number, direction: 'forward' | 'back') => {
     setTasks((tasks) =>

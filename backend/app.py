@@ -1,9 +1,11 @@
 from flask import Flask, request, redirect
+from flask_cors import CORS
 import json, uuid
 from helper import *
 
 # Create a Flask application instance
 app = Flask(__name__)
+CORS(app)
 
 # Define a route for the home page ("/")
 @app.route('/')
@@ -46,6 +48,10 @@ def get_users_route():
 def get_user_tasklist_route(username):
     print(username)
     return get_user_tasks(username)
+
+@app.route('/get_all_tasks')
+def get_all_tasks_route():
+    return get_all_tasks()
 
 @app.route('/get_upcoming_tasks')
 def get_upcoming_tasks_route():

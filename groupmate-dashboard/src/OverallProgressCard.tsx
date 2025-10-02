@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface ProgressData {
+export interface ProgressData {
   completed: number;
   in_progress: number;
   not_started: number;

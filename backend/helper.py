@@ -115,3 +115,10 @@ def get_current_tasks():
     return {
         'tasks': tasks
     }
+
+def get_all_tasks():
+    data = getData()
+    tasks = [] if 'tasks' not in data else data['tasks']
+    return {
+        'tasks': tasks
+    }
