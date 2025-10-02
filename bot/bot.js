@@ -11,7 +11,7 @@ const client = new Client({
 const projects = {}; 
 
 // Ready
-client.once("clientReady", () => {
+client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
