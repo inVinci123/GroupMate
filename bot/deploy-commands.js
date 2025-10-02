@@ -10,20 +10,20 @@ if (!fs.existsSync(envPath)) {
 }
 dotenv.config({ path: envPath });
 
-// Read environment variables
+// Now read environment variables
 const { DISCORD_TOKEN, CLIENT_ID, GUILD_ID } = process.env;
+
+// Check that they are loaded
+console.log("DISCORD_TOKEN loaded?", !!DISCORD_TOKEN);
+console.log("CLIENT_ID:", CLIENT_ID);
+console.log("GUILD_ID:", GUILD_ID);
 
 // Validate environment variables
 if (!DISCORD_TOKEN || !CLIENT_ID || !GUILD_ID) {
-  console.error("Missing required environment variables in .env file!");
+  console.error("❌ Missing required environment variables in .env file!");
   console.error("Make sure DISCORD_TOKEN, CLIENT_ID, and GUILD_ID are set.");
   process.exit(1);
 }
-
-console.log("Environment variables loaded:");
-console.log("CLIENT_ID:", CLIENT_ID);
-console.log("GUILD_ID:", GUILD_ID);
-console.log("DISCORD_TOKEN first 5 chars:", DISCORD_TOKEN.slice(0, 5));
 
 // Define slash commands
 const commands = [
@@ -61,15 +61,15 @@ const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
 // Deploy commands
 (async () => {
   try {
-    console.log("Deploying commands...");
+    console.log("🚀 Deploying commands...");
 
     await rest.put(
       Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
       { body: commands }
     );
 
-    console.log("Commands deployed successfully!");
+    console.log("✅ Commands deployed successfully!");
   } catch (error) {
-    console.error("Error deploying commands:", error);
+    console.error("❌ Error deploying commands:", error);
   }
 })();
