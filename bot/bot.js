@@ -11,7 +11,7 @@ const client = new Client({
 const projects = {};
 
 // Ready
-client.once("ready", () => {
+client.once("cilentReady", () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
