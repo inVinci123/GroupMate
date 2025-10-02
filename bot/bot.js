@@ -7,8 +7,8 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 });
 
-// In-memory storage
-const projects = {}; 
+// In-memory storage for projects and tasks
+const projects = {};
 
 // Ready
 client.once("ready", () => {
@@ -21,24 +21,19 @@ client.on("interactionCreate", async (interaction) => {
 
   const { commandName } = interaction;
 
-  // Simple ping
   if (commandName === "ping") {
     await interaction.reply("Pong!");
   }
 
-  // Create project
   if (commandName === "newproject") {
     const name = interaction.options.getString("name");
-
     if (projects[name]) {
       return interaction.reply({ content: `Project "${name}" already exists!`, ephemeral: true });
     }
-
     projects[name] = [];
     await interaction.reply(`Project created: **${name}**`);
   }
 
-  // Add task
   if (commandName === "addtask") {
     const project = interaction.options.getString("project");
     const task = interaction.options.getString("task");
@@ -52,7 +47,6 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.reply(`Task "${task}" added to project "${project}", due ${due}`);
   }
 
-  // List projects
   if (commandName === "listprojects") {
     if (Object.keys(projects).length === 0) {
       return interaction.reply("No projects found.");
